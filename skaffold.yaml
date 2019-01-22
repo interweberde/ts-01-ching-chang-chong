@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/interweberde/ts-01-ching-chang-chong:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/interweberde/ts-01-ching-chang-chong:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: ts-01-ching-chang-chong
+        chartPath: charts/ts-01-ching-chang-chong
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/interweberde/ts-01-ching-chang-chong'
+          image.tag: '{{.DIGEST_HEX}}'
